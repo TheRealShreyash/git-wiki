@@ -1,0 +1,13 @@
+{
+  "name": "git-wiki",
+  "module": "src/index.js",
+  "private": true,
+  "scripts": {
+    "dev": "bun --watch src/index.js"
+  },
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  }
+}
