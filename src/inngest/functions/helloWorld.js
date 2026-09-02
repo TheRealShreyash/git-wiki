@@ -1,4 +1,4 @@
-import { inngest } from "../client";
+import { inngest } from "../client.js";
 
 export const helloWorld = inngest.createFunction(
   { id: "hello-world", triggers: [{ event: "test/hello.world" }] },
