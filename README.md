@@ -393,18 +393,6 @@ git-wiki/
 
 ---
 
-## 💡 What Can You Build With This?
-
-With `git-wiki` as your foundational RAG and code ingestion engine, you can build:
-
-1. **AI Code Reviewer & PR Explainer**: Trigger indexing automatically on GitHub webhooks when a pull request opens, then have `git-wiki` generate a summary of how the PR impacts existing architecture.
-2. **Interactive Developer Documentation (DocuSearch)**: Embed the `/api/chat/stream` endpoint into an interactive documentation site (like Mintlify, GitBook, or Docusaurus) where developers can ask technical questions and see highlighted code lines.
-3. **Automated Wiki Generator**: Write a scheduled script that crawls every directory in a repo and generates a full Notion or Markdown wiki covering architecture, setup guides, and API contracts.
-4. **Slack / Discord Developer Bot**: Connect a Slack bot that listens to team questions like *"Where is our Stripe webhook handler?"* and replies with cited code snippets in threads.
-5. **Multi-Repo Architecture Search**: Index an entire company's microservices into separate Pinecone namespaces and search across services to map inter-service API dependencies.
-
----
-
 <p align="center">
   Built with ❤️ using Bun, Express, LangChain, Google Gemini, Pinecone, and Inngest.
 </p>
