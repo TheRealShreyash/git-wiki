@@ -3,6 +3,7 @@
   "module": "src/index.js",
   "private": true,
   "scripts": {
+    "start": "bun src/index.js",
     "dev": "bun --watch src/index.js"
   },
   "type": "module",
