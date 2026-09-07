@@ -9,7 +9,7 @@ import reposRoutes from "./routes/repos.routes.js";
 const app = express();
 
 const allowedOrigins = (
-  process.env.CORS_ORIGIN || "http://localhost:5173,http://localhost:3000"
+  process.env.CORS_ORIGIN || "http://localhost:5173,http://localhost:3000,https://grepr.shreyxsh.me,https://grepr.vercel.app"
 )
   .split(",")
   .map((origin) => origin.trim());
