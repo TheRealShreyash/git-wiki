@@ -1,7 +1,9 @@
 import express from "express";
 import cors from "cors";
+import { toNodeHandler } from "better-auth/node";
 import { serve } from "inngest/express";
 import { inngest, functions } from "./inngest/index.js";
+import { auth } from "./lib/auth.js";
 import indexRoutes from "./routes/index.routes.js";
 import chatRoutes from "./routes/chat.routes.js";
 import reposRoutes from "./routes/repos.routes.js";
@@ -20,6 +22,9 @@ app.use(
     credentials: true,
   }),
 );
+
+// Better Auth needs the raw request body itself — must be mounted before express.json().
+app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
