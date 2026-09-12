@@ -1,9 +1,8 @@
 # dependencies (bun install)
 node_modules
 
-# local sqlite database
-data.sqlite
-data.sqlite-*
+# prisma
+prisma/generated
 
 # output
 out

@@ -48,20 +48,20 @@ export const indexRepo = inngest.createFunction(
     return await step.run("index-repository-pipeline", async () => {
       try {
         console.log(`[Inngest] Starting repository indexing for ${repoKey}...`);
-        updateRepoProgress(repoKey, { status: "crawling" });
-        appendLog(repoKey, "step", "Crawling repository tree...");
+        await updateRepoProgress(repoKey, { status: "crawling" });
+        await appendLog(repoKey, "step", "Crawling repository tree...");
 
         // 1. Fetch files from GitHub
         const files = await fetchRepoFiles(githubToken, owner, repoName);
         console.log(`[Inngest] Fetched ${files ? files.length : 0} files.`);
 
         if (!files || files.length === 0) {
-          updateRepoProgress(repoKey, {
+          await updateRepoProgress(repoKey, {
             status: "error",
             errorMessage: "No indexable files found.",
             durationMs: Date.now() - startedAt,
           });
-          appendLog(repoKey, "warn", "No indexable files found.");
+          await appendLog(repoKey, "warn", "No indexable files found.");
           return {
             repo: repoKey,
             fileCount: 0,
@@ -70,46 +70,46 @@ export const indexRepo = inngest.createFunction(
           };
         }
 
-        for (const file of files) {
-          upsertFileMeta(repoKey, file.path, file.sha, file.size);
-        }
+        await Promise.all(
+          files.map((file) => upsertFileMeta(repoKey, file.path, file.sha, file.size)),
+        );
 
-        updateRepoProgress(repoKey, {
+        await updateRepoProgress(repoKey, {
           status: "chunking",
           totalFiles: files.length,
           language: detectLanguage(files),
         });
-        appendLog(repoKey, "ok", `Crawled ${files.length} files.`);
+        await appendLog(repoKey, "ok", `Crawled ${files.length} files.`);
 
         // 2. Chunk repository files
         const documents = await chunkFiles(files, repoKey);
         const chunkCount = documents ? documents.length : 0;
         console.log(`[Inngest] Generated ${chunkCount} document chunks.`);
 
-        updateRepoProgress(repoKey, {
+        await updateRepoProgress(repoKey, {
           status: "embedding",
           totalChunks: chunkCount,
           totalBatches: Math.ceil(chunkCount / 30),
         });
-        appendLog(repoKey, "ok", `Generated ${chunkCount} chunks.`);
+        await appendLog(repoKey, "ok", `Generated ${chunkCount} chunks.`);
 
         // 3. Save chunks into Pinecone vector store
         if (documents && documents.length > 0) {
-          await saveChunks(repoKey, documents, undefined, ({ batch, totalBatches, embedded }) => {
-            updateRepoProgress(repoKey, { embeddedBatches: batch, totalBatches });
-            appendLog(repoKey, "step", `Embedded batch ${batch}/${totalBatches} (${embedded} chunks)...`);
+          await saveChunks(repoKey, documents, undefined, async ({ batch, totalBatches, embedded }) => {
+            await updateRepoProgress(repoKey, { embeddedBatches: batch, totalBatches });
+            await appendLog(repoKey, "step", `Embedded batch ${batch}/${totalBatches} (${embedded} chunks)...`);
           });
           console.log(
             `[Inngest] Successfully indexed chunks in Pinecone namespace "${repoKey}".`,
           );
         }
 
-        updateRepoProgress(repoKey, {
+        await updateRepoProgress(repoKey, {
           status: "ready",
           progress: 1,
           durationMs: Date.now() - startedAt,
         });
-        appendLog(repoKey, "ok", "Indexing complete.");
+        await appendLog(repoKey, "ok", "Indexing complete.");
 
         return {
           repo: repoKey,
@@ -118,12 +118,12 @@ export const indexRepo = inngest.createFunction(
         };
       } catch (error) {
         console.error(`[Inngest] Indexing failed for ${repoKey}:`, error);
-        updateRepoProgress(repoKey, {
+        await updateRepoProgress(repoKey, {
           status: "error",
           errorMessage: error.message,
           durationMs: Date.now() - startedAt,
         });
-        appendLog(repoKey, "warn", `Failed: ${error.message}`);
+        await appendLog(repoKey, "warn", `Failed: ${error.message}`);
         throw error;
       }
     });

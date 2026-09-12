@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Repo {
+  id              String   @id
+  owner           String
+  name            String
+  url             String
+  branch          String   @default("main")
+  isPrivate       Boolean  @default(false)
+  language        String?
+  totalFiles      Int      @default(0)
+  totalChunks     Int      @default(0)
+  embeddedBatches Int      @default(0)
+  totalBatches    Int      @default(0)
+  status          String   @default("queued")
+  progress        Float    @default(0)
+  eventId         String?
+  githubToken     String?
+  logs            Json     @default("[]")
+  errorMessage    String?
+  startedAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  durationMs      Int?
+
+  messages Message[]
+  files    RepoFile[]
+
+  @@map("repos")
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  repoId    String
+  role      String
+  content   String
+  sources   Json     @default("[]")
+  createdAt DateTime @default(now())
+
+  repo Repo @relation(fields: [repoId], references: [id], onDelete: Cascade)
+
+  @@index([repoId])
+  @@map("messages")
+}
+
+model RepoFile {
+  repoId String
+  path   String
+  sha    String?
+  size   Int?
+
+  repo Repo @relation(fields: [repoId], references: [id], onDelete: Cascade)
+
+  @@id([repoId, path])
+  @@map("files")
+}

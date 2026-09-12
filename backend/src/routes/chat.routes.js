@@ -180,8 +180,8 @@ chatRoutes.post("/stream", async (req, res) => {
       res.write(`event: token\ndata: ${JSON.stringify(chunk)}\n\n`);
     }
 
-    addMessage(repoKey, "user", q.trim(), []);
-    addMessage(repoKey, "assistant", fullAnswer, sources);
+    await addMessage(repoKey, "user", q.trim(), []);
+    await addMessage(repoKey, "assistant", fullAnswer, sources);
 
     res.write(`event: done\ndata: {}\n\n`);
     res.end();

@@ -269,7 +269,7 @@ export async function saveChunks(
       throw error;
     }
 
-    onBatch?.({
+    await onBatch?.({
       batch: batchNum,
       totalBatches,
       embedded: Math.min(i + BATCH_SIZE, validDocs.length),

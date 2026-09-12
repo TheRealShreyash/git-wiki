@@ -50,7 +50,7 @@ indexRoutes.post("/", async (req, res) => {
 
     const eventId = response.ids?.[0];
 
-    upsertRepo({
+    await upsertRepo({
       id: repoId,
       owner,
       name: repoName,

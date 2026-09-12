@@ -81,20 +81,20 @@ function toRow(repo) {
 }
 
 /** GET /api/repos — every repo ever indexed. */
-reposRoutes.get("/", (req, res) => {
-  res.json(listRepos().map(toRow));
+reposRoutes.get("/", async (req, res) => {
+  res.json((await listRepos()).map(toRow));
 });
 
 /** GET /api/repos/one?id=owner/repo — static repo info. */
-reposRoutes.get("/one", (req, res) => {
-  const repo = getRepo(req.query.id);
+reposRoutes.get("/one", async (req, res) => {
+  const repo = await getRepo(req.query.id);
   if (!repo) return res.status(404).json({ error: "Repository not indexed" });
   res.json(toRow(repo));
 });
 
 /** GET /api/repos/status?id=owner/repo — live progress for the tracker page. */
-reposRoutes.get("/status", (req, res) => {
-  const repo = getRepo(req.query.id);
+reposRoutes.get("/status", async (req, res) => {
+  const repo = await getRepo(req.query.id);
   if (!repo) return res.status(404).json({ error: "Repository not indexed" });
 
   const stages = STAGES.map((id) => {
@@ -162,10 +162,10 @@ reposRoutes.get("/status", (req, res) => {
 reposRoutes.get("/file", async (req, res) => {
   try {
     const { id, path } = req.query;
-    const repo = getRepo(id);
+    const repo = await getRepo(id);
     if (!repo) return res.status(404).json({ error: "Repository not indexed" });
 
-    const meta = getFileMeta(id, path);
+    const meta = await getFileMeta(id, path);
     if (!meta || !meta.sha) {
       return res.status(404).json({ error: `${path} is not indexed` });
     }
@@ -185,13 +185,13 @@ reposRoutes.get("/file", async (req, res) => {
 });
 
 /** GET /api/repos/messages?id=owner/repo — chat history. */
-reposRoutes.get("/messages", (req, res) => {
-  res.json(listMessages(req.query.id));
+reposRoutes.get("/messages", async (req, res) => {
+  res.json(await listMessages(req.query.id));
 });
 
 /** DELETE /api/repos/messages?id=owner/repo — clear chat history. */
-reposRoutes.delete("/messages", (req, res) => {
-  clearMessages(req.query.id);
+reposRoutes.delete("/messages", async (req, res) => {
+  await clearMessages(req.query.id);
   res.json({ ok: true });
 });
 
